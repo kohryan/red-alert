@@ -1,0 +1,60 @@
+name: security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Least privilege: read-only by default, nothing is written by this workflow.
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    name: Defensive baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Toolchain check
+        run: |
+          python3 --version
+          git --version
+          bash --version | head -1
+
+      - name: Secret scan
+        run: python3 scripts/sec/secret_scan.py . --fail-on critical
+
+      - name: Repository hygiene and dependency audit
+        run: scripts/sec/baseline.sh --path . --format text --fail-on critical
+
+      - name: Syntax and tooling/webapp self-tests (local fixtures only)
+        run: make test
+
+  skills:
+    name: Skill and agent integrity
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Every skill has frontmatter with name and description
+        run: |
+          set -euo pipefail
+          for skill in .kilo/skills/*/SKILL.md; do
+            grep -q '^name:' "$skill" || { echo "missing name: $skill"; exit 1; }
+            grep -q '^description:' "$skill" || { echo "missing description: $skill"; exit 1; }
+          done
+
+      - name: Every skill reference link resolves
+        run: |
+          set -euo pipefail
+          python3 scripts/re/check_links.py

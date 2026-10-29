@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>red-alert · web reconnaissance console</title>
+<link rel="stylesheet" href="/static/style.css?v={{ASSET_VERSION}}">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff5a5f' stroke-width='2'><path d='M12 2 2 20h20L12 2z'/><path d='M12 9v5'/><path d='M12 17.5v.01'/></svg>">
+</head>
+<body>
+<div id="app" class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">▲</span>
+      <div class="brand-text">
+        <b>red-alert</b>
+        <small>web reconnaissance</small>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <details class="nav-section" id="target-section" open>
+        <summary class="nav-group">
+          <span>Scanned targets</span>
+          <span class="nav-count" id="target-count">0</span>
+        </summary>
+        <div class="nav-items" id="target-list">
+          <div class="nav-empty" id="target-empty">No target has been scanned yet.</div>
+        </div>
+      </details>
+
+      <details class="nav-section" open>
+        <summary class="nav-group"><span>Surface</span><span class="nav-caret">▸</span></summary>
+        <div class="nav-items">
+          <button class="nav-item active" data-view="overview"><span>◈</span> Overview</button>
+          <button class="nav-item" data-view="surface"><span>⌘</span> Paths &amp; assets</button>
+          <button class="nav-item" data-view="api"><span>⇄</span> API surface</button>
+          <button class="nav-item" data-view="endpoints"><span>⌁</span> API contract</button>
+          <button class="nav-item" data-view="data"><span>▤</span> Extracted data</button>
+        </div>
+      </details>
+
+      <details class="nav-section">
+        <summary class="nav-group"><span>Findings</span><span class="nav-caret">▸</span></summary>
+        <div class="nav-items">
+          <button class="nav-item" data-view="graph"><span>⬡</span> Attack graph</button>
+          <button class="nav-item" data-view="exposure"><span>⚠</span> Exposure</button>
+          <button class="nav-item" data-view="leaks"><span>✦</span> Credentials</button>
+          <button class="nav-item" data-view="information"><span>◫</span> Disclosures</button>
+          <button class="nav-item" data-view="sources"><span>⎘</span> Source maps</button>
+          <button class="nav-item" data-view="recovered"><span>⛏</span> Recovered files</button>
+          <button class="nav-item" data-view="vulnerabilities"><span>⚡</span> Vulnerabilities</button>
+          <button class="nav-item" data-view="cves"><span>☷</span> CVEs</button>
+        </div>
+      </details>
+
+      <details class="nav-section">
+        <summary class="nav-group"><span>Red team</span><span class="nav-caret">▸</span></summary>
+        <div class="nav-items">
+          <button class="nav-item" data-view="agent"><span>▲</span> Exploit agent</button>
+          <button class="nav-item" data-view="probes"><span>⟁</span> Jailbreak probes</button>
+        </div>
+      </details>
+
+      <details class="nav-section">
+        <summary class="nav-group"><span>Evidence</span><span class="nav-caret">▸</span></summary>
+        <div class="nav-items">
+          <button class="nav-item" data-view="triage"><span>◎</span> Triage</button>
+          <button class="nav-item" data-view="coverage"><span>◱</span> Coverage</button>
+          <button class="nav-item" data-view="audit"><span>≡</span> Audit</button>
+          <button class="nav-item" data-view="log"><span>▤</span> Run log</button>
+        </div>
+      </details>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="meta-line"><span>target</span><b id="foot-target">—</b></div>
+      <div class="meta-line"><span>tables</span><b id="foot-tables">—</b></div>
+      <div class="meta-line"><span>generated</span><b id="foot-generated">—</b></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="scanbar">
+        <span class="scanbar-icon">⌕</span>
+        <input id="scan-url" class="scan-input" type="url" spellcheck="false" autocomplete="off"
+               placeholder="https://target.example — press Enter to recon">
+        <button class="btn btn-primary" id="btn-scan">Recon</button>
+      </div>
+      <div class="topbar-right">
+        <span class="pill" id="status-pill" data-state="idle">idle</span>
+        <a class="btn btn-ghost" id="btn-json" href="/api/dataset" download>JSON</a>
+        <a class="btn btn-ghost" id="btn-pdf" href="/api/report.pdf" download>PDF</a>
+      </div>
+    </header>
+
+    <div class="view-head">
+      <h1 id="view-title">Overview</h1>
+      <p id="view-subtitle"></p>
+    </div>
+
+    <section class="content" id="content">
+      <div class="empty" id="empty-state">
+        <div class="empty-card">
+          <h2>Nothing scanned yet</h2>
+          <p>Type a target URL above and press <kbd>Enter</kbd>. The recon will discover the
+             surface, probe what is exposed, look for credential-shaped strings in the served
+             files, and extract the data behind them — then report all of it.</p>
+          <div class="empty-rules">
+            <div><b>same origin only</b><span>nothing off-host is fetched</span></div>
+            <div><b>read-only</b><span>GET requests, no credentials</span></div>
+            <div><b>bounded</b><span>rate, volume and size ceilings</span></div>
+            <div><b>redacted</b><span>found credentials are masked</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+</div>
+
+<!-- ------------------------------------------------------------- scan modal -->
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h2 id="modal-title">Recon</h2>
+        <p id="modal-sub">—</p>
+      </div>
+      <button class="modal-close" id="modal-close" title="Close" hidden>×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- preflight -->
+      <div class="preflight" id="preflight">
+        <p class="preflight-text">
+          The scan will request the target and the resources it advertises. It is read-only,
+          stays on the target's own host, and honours <code>robots.txt</code>.
+        </p>
+        <label class="check">
+          <input type="checkbox" id="chk-owned">
+          <span>I own this target, or I am authorised to examine it.</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="chk-active">
+          <span>Run the active checks: prove the impact of what is exposed — cross-origin reads,
+                files outside the web root, per-record data without a session, injectable
+                parameters, verbose errors. Nothing is executed on the target.</span>
+        </label>
+        <p class="preflight-text" style="margin-top:14px">
+          If the target sits behind a WAF that challenges unknown clients, identify the scanner
+          with a user agent that names you:
+        </p>
+        <input class="input" id="scan-ua" type="text" style="width:100%"
+               placeholder="red-alert/1.0 (+https://your.site — contact@your.site)">
+        <p class="preflight-error" id="preflight-error" hidden></p>
+      </div>
+
+      <!-- progress -->
+      <div class="progress" id="progress" hidden>
+        <div class="progress-head">
+          <div class="progress-phase">
+            <span class="spinner" id="spinner"></span>
+            <b id="phase-label">starting</b>
+          </div>
+          <div class="progress-percent" id="progress-percent">0%</div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="log" id="log"></div>
+      </div>
+
+      <!-- result -->
+      <div class="result" id="result" hidden>
+        <div class="result-grid" id="result-grid"></div>
+        <div class="result-notes" id="result-notes"></div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn" id="modal-cancel" hidden>Cancel</button>
+      <button class="btn btn-primary" id="btn-start">Start recon</button>
+      <button class="btn btn-primary" id="btn-view-results" hidden>View results</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js?v={{ASSET_VERSION}}"></script>
+</body>
+</html>

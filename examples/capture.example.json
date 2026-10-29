@@ -1,0 +1,125 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "red-alert example",
+      "version": "1.0"
+    },
+    "entries": [
+      {
+        "startedDateTime": "2026-01-01T00:00:00.000Z",
+        "request": {
+          "method": "GET",
+          "url": "https://example.invalid/api/catalog/items?limit=50&page=1",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "User-Agent",
+              "value": "example-browser/1.0"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [
+            {
+              "name": "limit",
+              "value": "50"
+            },
+            {
+              "name": "page",
+              "value": "1"
+            }
+          ]
+        },
+        "response": {
+          "status": 200,
+          "content": {
+            "mimeType": "application/json",
+            "text": "{\"items\":[{\"id\":\"a-1\",\"title\":\"First\",\"updated_at\":\"2026-01-01T00:00:00Z\"},{\"id\":\"a-2\",\"title\":\"Second\",\"updated_at\":\"2026-01-02T00:00:00Z\"}]}"
+          }
+        }
+      },
+      {
+        "startedDateTime": "2026-01-01T00:00:05.000Z",
+        "request": {
+          "method": "GET",
+          "url": "https://example.invalid/api/catalog/items?limit=50&page=2",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "User-Agent",
+              "value": "example-browser/1.0"
+            }
+          ],
+          "queryString": [
+            {
+              "name": "limit",
+              "value": "50"
+            },
+            {
+              "name": "page",
+              "value": "2"
+            }
+          ]
+        },
+        "response": {
+          "status": 200,
+          "content": {
+            "mimeType": "application/json",
+            "text": "{\"items\":[{\"id\":\"a-3\",\"title\":\"Third\",\"updated_at\":\"2026-01-03T00:00:00Z\"}]}"
+          }
+        }
+      },
+      {
+        "startedDateTime": "2026-01-01T00:00:09.000Z",
+        "request": {
+          "method": "GET",
+          "url": "https://example.invalid/api/catalog/items/a-1",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "User-Agent",
+              "value": "example-browser/1.0"
+            }
+          ],
+          "queryString": []
+        },
+        "response": {
+          "status": 200,
+          "content": {
+            "mimeType": "application/json",
+            "text": "{\"id\":\"a-1\",\"title\":\"First\",\"updated_at\":\"2026-01-01T00:00:00Z\"}"
+          }
+        }
+      },
+      {
+        "startedDateTime": "2026-01-01T00:00:12.000Z",
+        "request": {
+          "method": "GET",
+          "url": "https://example.invalid/api/session",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Authorization",
+              "value": "Bearer REDACTED-EXAMPLE-VALUE"
+            },
+            {
+              "name": "Cookie",
+              "value": "session=REDACTED-EXAMPLE-VALUE"
+            }
+          ],
+          "queryString": []
+        },
+        "response": {
+          "status": 200,
+          "content": {
+            "mimeType": "application/json",
+            "text": "{\"user\":\"REDACTED\"}"
+          }
+        }
+      }
+    ]
+  }
+}

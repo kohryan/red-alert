@@ -1,0 +1,40 @@
+{
+  "name": "local-catalogue",
+  "base_url": "http://127.0.0.1:8801",
+  "description": "Synthetic JSON API served by examples/api-origin.py; no external target.",
+  "authorization": {
+    "status": "granted",
+    "scope": "Read-only GET of the synthetic API fixture started locally by the operator on port 8801.",
+    "reference": "self-owned local fixture: examples/api-origin.py"
+  },
+  "respect_robots": true,
+  "headers": {
+    "User-Agent": "red-alert-webapp/1.0 (local synthetic example)",
+    "Accept": "application/json"
+  },
+  "limits": {
+    "requests_per_minute": 60,
+    "max_concurrency": 1,
+    "timeout_seconds": 10,
+    "max_requests_per_run": 5,
+    "max_bytes_per_response": 1048576,
+    "max_items": 200
+  },
+  "cache": {
+    "directory": ".cache/webpipe"
+  },
+  "sources": [
+    {
+      "id": "catalogue",
+      "path": "/api/items",
+      "kind": "json",
+      "dataset": "catalogue"
+    },
+    {
+      "id": "summary",
+      "path": "/api/summary",
+      "kind": "json",
+      "dataset": "summary"
+    }
+  ]
+}

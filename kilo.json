@@ -1,0 +1,53 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "docs/methodology/00-principles.md"
+  ],
+  "skills": {
+    "paths": [".kilo/skills"]
+  },
+  "permission": {
+    "read": {
+      "**/*.env": "deny",
+      "**/.env": "deny",
+      "**/.env.*": "deny",
+      "**/id_rsa": "deny",
+      "**/id_ed25519": "deny",
+      "**/*.pem": "deny",
+      "**/*.p12": "deny",
+      "**/secrets/**": "deny",
+      "**/credentials/**": "deny",
+      "*": "allow"
+    },
+    "edit": {
+      "*.key": "deny",
+      "*.pem": "deny",
+      "*": "allow"
+    },
+    "bash": {
+      "rm -rf /": "deny",
+      "sudo ": "deny",
+      "scripts/red-alert/*": "allow",
+      "scripts/*": "allow",
+      "*scripts/*": "allow",
+      "make ": "allow",
+      "git status": "allow",
+      "git diff": "allow",
+      "git log": "allow",
+      "*": "ask"
+    },
+    "webfetch": "allow",
+    "websearch": "allow",
+    "task": "allow",
+    "external_directory": "deny"
+  },
+  "mcp": {
+    "rea": {
+      "type": "local",
+      "command": ["npx", "-y", "rea-agents@latest", "mcp"],
+      "enabled": false,
+      "timeout": 600000
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "example-catalog",
+  "base_url": "https://example.invalid",
+  "description": "Public catalogue items, as permitted by the site owner.",
+  "authorization": {
+    "status": "granted",
+    "scope": "Public catalogue pages only. No authentication, no personal data.",
+    "reference": "self-owned"
+  },
+  "respect_robots": true,
+  "headers": {
+    "User-Agent": "red-alert-pipeline/1.0 (+https://example.invalid/contact)",
+    "Accept": "application/json"
+  },
+  "limits": {
+    "requests_per_minute": 6,
+    "max_concurrency": 1,
+    "timeout_seconds": 20,
+    "max_requests_per_run": 60,
+    "max_items": 200,
+    "max_pages_per_endpoint": 10
+  },
+  "endpoints": [
+    {
+      "id": "catalog-items",
+      "method": "GET",
+      "path": "/api/catalog/items",
+      "query": {
+        "limit": "50"
+      },
+      "items_pointer": "items",
+      "fields": [
+        "id",
+        "title",
+        "updated_at"
+      ],
+      "paginate": {
+        "type": "page",
+        "param": "page",
+        "start": 1
+      }
+    }
+  ],
+  "cache": {
+    "enabled": true,
+    "directory": ".cache/webpipe"
+  },
+  "storage": {
+    "format": "jsonl",
+    "path": "data/catalog-items.jsonl",
+    "dedupe_key": "id"
+  }
+}
